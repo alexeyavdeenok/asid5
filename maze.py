@@ -3,6 +3,7 @@ from collections import deque
 from typing import Tuple, List
 from PIL import Image
 
+
 def maze_check(maze: list) -> bool:
     """
     Проверяет корректность лабиринта.
@@ -100,7 +101,7 @@ class Maze:
             None
         """
         if start is None:
-            start = (1, 1)
+            start = (0, 0)
         if end is None:
             end = (self.height - 1, self.width - 1)
         # Преобразование стартовой и конечной позиции в реальные координаты
@@ -160,6 +161,13 @@ class Maze:
         # Если выход из цикла, пути не существует
         self.list_way = []
 
+    def print_solution(self):
+        """Отображение решения в лабиринте."""
+        for y, x in self.list_way:
+            if self.list_maze[y][x] == '1':
+                self.list_maze[y][x] = '.'
+        self.print_maze()
+
     def load_maze_from_file(self, file_path: str) -> list:
         """
         Загружает лабиринт из текстового файла с проверкой на валидность.
@@ -211,7 +219,6 @@ class Maze:
         Сохраняет лабиринт в виде изображения.
 
         Args:
-            maze (list): Двумерный массив лабиринта.
             output_path (str): Путь для сохранения изображения.
             cell_size (int): Размер клетки в пикселях.
         """
@@ -228,13 +235,57 @@ class Maze:
         # Заполняем изображение в соответствии с лабиринтом
         for i in range(rows):
             for j in range(cols):
-                color = (0, 0, 0) if self.list_maze[i][j] == '0' else (255, 255, 255)  # Черный или белый
+                if (i, j) in self.list_way:
+                    color = (255, 100, 200)
+                else:
+                    color = (0, 0, 0) if self.list_maze[i][j] == '0' else (255, 255, 255)  # Черный или белый
                 for x in range(cell_size):
                     for y in range(cell_size):
                         pixels[j * cell_size + x, i * cell_size + y] = color
 
         # Сохранение изображения
         img.save(output_path)
+
+    def load_maze_from_image(self, image_path: str, cell_size: int = 20) -> None:
+        """
+        Импортирует лабиринт из изображения.
+
+        Args:
+            image_path (str): Путь к изображению лабиринта.
+            cell_size (int): Размер клетки в пикселях.
+
+        Returns:
+            list: Двумерный массив, представляющий лабиринт.
+        """
+        # Открыть изображение и перевести в черно-белый режим
+        img = Image.open(image_path).convert('L')  # Переводим в grayscale
+
+        # Получаем размеры лабиринта в клетках
+        rows = img.height // cell_size
+        cols = img.width // cell_size
+
+        # Создаем пустой массив для лабиринта
+        maze = []
+
+        for i in range(rows):
+            row = []
+            for j in range(cols):
+                # Определяем верхний левый угол клетки
+                top_left_x = j * cell_size
+                top_left_y = i * cell_size
+
+                # Проверяем средний пиксель клетки для определения ее цвета
+                mid_x = top_left_x + cell_size // 2
+                mid_y = top_left_y + cell_size // 2
+                color = img.getpixel((mid_x, mid_y))
+
+                # Черный цвет (0-127) — стена, белый (128-255) — проход
+                row.append('0' if color < 128 else '1')
+            maze.append(row)
+        if maze_check(maze):
+            self.list_maze = maze
+            self.height = len(self.list_maze)
+            self.width = len(self.list_maze[0])
 
     def build_right_walls(self):
         pass
@@ -245,57 +296,8 @@ class Maze:
     def check_walls(self):
         pass
 
-    def print_solution(self):
-        """Отображение решения в лабиринте."""
-        for y, x in self.list_way:
-            if self.list_maze[y][x] == '1':
-                self.list_maze[y][x] = '.'
-        self.print_maze()
-
-
-def load_maze_from_image(image_path: str, cell_size: int = 20) -> list:
-    """
-    Импортирует лабиринт из изображения.
-
-    Args:
-        image_path (str): Путь к изображению лабиринта.
-        cell_size (int): Размер клетки в пикселях.
-
-    Returns:
-        list: Двумерный массив, представляющий лабиринт.
-    """
-    # Открыть изображение и перевести в черно-белый режим
-    img = Image.open(image_path).convert('L')  # Переводим в grayscale
-
-    # Получаем размеры лабиринта в клетках
-    rows = img.height // cell_size
-    cols = img.width // cell_size
-
-    # Создаем пустой массив для лабиринта
-    maze = []
-
-    for i in range(rows):
-        row = []
-        for j in range(cols):
-            # Определяем верхний левый угол клетки
-            top_left_x = j * cell_size
-            top_left_y = i * cell_size
-
-            # Проверяем средний пиксель клетки для определения ее цвета
-            mid_x = top_left_x + cell_size // 2
-            mid_y = top_left_y + cell_size // 2
-            color = img.getpixel((mid_x, mid_y))
-
-            # Черный цвет (0-127) — стена, белый (128-255) — проход
-            row.append('0' if color < 128 else '1')
-        maze.append(row)
-
-    return maze
-
 
 
 if __name__ == '__main__':
-    maze = Maze(10, 10)
-    maze.list_maze = load_maze_from_image('maze.png')
-    maze.save_maze_as_image('maze.jpg')
-
+    maxe = Maze(10, 10)
+    
