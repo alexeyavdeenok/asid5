@@ -4,49 +4,6 @@ from typing import Tuple, List
 from PIL import Image
 
 
-def maze_check(maze: list) -> bool:
-    """
-    Проверяет корректность лабиринта.
-
-    Условия:
-    1. Лабиринт должен быть окружён стенами (значениями '0').
-    2. Внутренняя клетка '1' не должна быть полностью окружена стенами.
-
-    Args:
-        maze (list): Двумерный массив лабиринта.
-
-    Returns:
-        bool: True, если лабиринт корректный, иначе False.
-
-    Raises:
-        ValueError: Если лабиринт некорректен.
-    """
-    rows = len(maze)
-    cols = len(maze[0])
-
-    # Проверка, что лабиринт окружён стенами
-    if any(cell != '0' for cell in maze[0] + maze[-1]):  # Верхняя и нижняя границы
-        raise ValueError("Лабиринт должен быть окружён стенами сверху и снизу.")
-    if any(row[0] != '0' or row[-1] != '0' for row in maze):  # Левые и правые границы
-        raise ValueError("Лабиринт должен быть окружён стенами слева и справа.")
-
-    # Проверка, что ни одна внутренняя клетка '1' не окружена стенами
-    for i in range(1, rows - 1):  # Пропускаем границы
-        for j in range(1, cols - 1):
-            if maze[i][j] == '1':
-                # Проверяем соседей (верх, низ, лево, право)
-                neighbors = [
-                    maze[i - 1][j],  # Верх
-                    maze[i + 1][j],  # Низ
-                    maze[i][j - 1],  # Лево
-                    maze[i][j + 1],  # Право
-                ]
-                if all(neighbor == '0' for neighbor in neighbors):
-                    raise ValueError(f"Клетка {i, j} окружена стенами со всех сторон.")
-
-    return True
-
-
 class Maze:
     """
     Класс реализует лабиринт, алгоритм генерации, решения и импорта лабиринта
@@ -210,6 +167,8 @@ class Maze:
 
         if maze_check(maze):
             self.list_maze = maze
+            self.height = len(self.list_maze)
+            self.width = len(self.list_maze[0])
 
         return maze
 
@@ -305,6 +264,49 @@ class Maze:
 
     def check_walls(self):
         pass
+
+
+def maze_check(maze: list) -> bool:
+    """
+    Проверяет корректность лабиринта.
+
+    Условия:
+    1. Лабиринт должен быть окружён стенами (значениями '0').
+    2. Внутренняя клетка '1' не должна быть полностью окружена стенами.
+
+    Args:
+        maze (list): Двумерный массив лабиринта.
+
+    Returns:
+        bool: True, если лабиринт корректный, иначе False.
+
+    Raises:
+        ValueError: Если лабиринт некорректен.
+    """
+    rows = len(maze)
+    cols = len(maze[0])
+
+    # Проверка, что лабиринт окружён стенами
+    if any(cell != '0' for cell in maze[0] + maze[-1]):  # Верхняя и нижняя границы
+        raise ValueError("Лабиринт должен быть окружён стенами сверху и снизу.")
+    if any(row[0] != '0' or row[-1] != '0' for row in maze):  # Левые и правые границы
+        raise ValueError("Лабиринт должен быть окружён стенами слева и справа.")
+
+    # Проверка, что ни одна внутренняя клетка '1' не окружена стенами
+    for i in range(1, rows - 1):  # Пропускаем границы
+        for j in range(1, cols - 1):
+            if maze[i][j] == '1':
+                # Проверяем соседей (верх, низ, лево, право)
+                neighbors = [
+                    maze[i - 1][j],  # Верх
+                    maze[i + 1][j],  # Низ
+                    maze[i][j - 1],  # Лево
+                    maze[i][j + 1],  # Право
+                ]
+                if all(neighbor == '0' for neighbor in neighbors):
+                    raise ValueError(f"Клетка {i, j} окружена стенами со всех сторон.")
+
+    return True
 
 
 if __name__ == '__main__':
