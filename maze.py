@@ -48,14 +48,24 @@ def maze_check(maze: list) -> bool:
 
 
 class Maze:
+    """
+    Класс реализует лабиринт, алгоритм генерации, решения и импорта лабиринта
+    """
     def __init__(self, height: int, width: int):
+        """
+        Инициализация лабиринта с созданием клеток окруженных стенами
+        :param height: высота
+        :param width: ширина
+        list_maze: список для лабиринта
+        list_way: список для пути от начальной до конечной точек
+        """
         self.height = height
         self.width = width
         self.list_maze = []
         self.list_way = []
         self.init_base_data()
 
-    def init_base_data(self):
+    def init_base_data(self) -> None:
         """Инициализация пустого лабиринта с внешними стенами."""
         # Создаем лабиринт размером (2*height + 1) на (2*width + 1)
         self.list_maze = [['0'] * (2 * self.width + 1) for _ in range(2 * self.height + 1)]
@@ -65,7 +75,7 @@ class Maze:
             for x in range(self.width):
                 self.list_maze[2 * y + 1][2 * x + 1] = '1'
 
-    def generate_maze(self):
+    def generate_maze(self) -> None:
         """Генерация лабиринта с использованием алгоритма бинарного дерева."""
         for y in range(self.height):
             for x in range(self.width):
@@ -84,7 +94,7 @@ class Maze:
                     else:
                         self.list_maze[2 * y + 2][2 * x + 1] = '1'  # Удаляем стену вниз
 
-    def print_maze(self):
+    def print_maze(self) -> None:
         """Вывод лабиринта."""
         for row in self.list_maze:
             print(' '.join(row).replace('0', '#').replace('1', ' '))
@@ -161,14 +171,14 @@ class Maze:
         # Если выход из цикла, пути не существует
         self.list_way = []
 
-    def print_solution(self):
+    def print_solution(self) -> None:
         """Отображение решения в лабиринте."""
         for y, x in self.list_way:
             if self.list_maze[y][x] == '1':
                 self.list_maze[y][x] = '.'
         self.print_maze()
 
-    def load_maze_from_file(self, file_path: str) -> list:
+    def load_maze_from_file(self, file_path: str) -> List:
         """
         Загружает лабиринт из текстового файла с проверкой на валидность.
 
@@ -214,7 +224,7 @@ class Maze:
             for row in self.list_maze:
                 file.write(''.join(row) + '\n')  # Преобразуем каждую строку в строку текста
 
-    def save_maze_as_image(self, output_path: str, cell_size: int = 20):
+    def save_maze_as_image(self, output_path: str, cell_size: int = 20) -> None:
         """
         Сохраняет лабиринт в виде изображения.
 
@@ -297,7 +307,5 @@ class Maze:
         pass
 
 
-
 if __name__ == '__main__':
     maxe = Maze(10, 10)
-    
