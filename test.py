@@ -66,6 +66,37 @@ class TestMazeFunctions(unittest.TestCase):
         self.assertEqual(len(self.maze.list_maze), 7, "Высота лабиринта должна быть корректной.")
         self.assertEqual(len(self.maze.list_maze[0]), 7, "Ширина лабиринта должна быть корректной.")
 
+    def test_maze_surrounded_by_walls(self):
+        """
+        Проверка, что лабиринт окружён стенами.
+        """
+        self.maze.generate_maze()
+
+        # Верхняя и нижняя границы
+        for cell in self.maze.list_maze[0] + self.maze.list_maze[-1]:
+            self.assertEqual(cell, '0', "Лабиринт должен быть окружён стенами сверху и снизу.")
+
+        # Левая и правая границы
+        for row in self.maze.list_maze:
+            self.assertEqual(row[0], '0', "Лабиринт должен быть окружён стенами слева.")
+            self.assertEqual(row[-1], '0', "Лабиринт должен быть окружён стенами справа.")
+
+    def test_path_contains_start_and_end(self):
+        """
+        Проверка, что путь содержит начальную и конечную точку, если они корректны.
+        """
+        start = (0, 0)
+        end = (2, 2)
+        self.maze.generate_maze()
+        self.maze.solve_maze(start, end)
+        # Преобразуем начальную и конечную позиции в координаты реального лабиринта
+        start_real = (2 * start[0] + 1, 2 * start[1] + 1)
+        end_real = (2 * end[0] + 1, 2 * end[1] + 1)
+
+        # Проверяем наличие начальной и конечной точки в пути
+        self.assertIn(start_real, self.maze.list_way, "Начальная точка должна быть в пути.")
+        self.assertIn(end_real, self.maze.list_way, "Конечная точка должна быть в пути.")
+
 
 if __name__ == "__main__":
     unittest.main()

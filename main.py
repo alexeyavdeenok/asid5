@@ -97,10 +97,13 @@ def main() -> None:
                 if args.export_solved_maze:
                     file_path = args.export_solved_maze
                     _, ext = os.path.splitext(file_path)
-                    if ext not in ('.png', '.jpg'):
+                    if ext not in ('.png', '.jpg', '.txt'):
                         print("Ошибка: поддерживаются только файлы с расширением .png, .jpg.")
                         return
-                    maze.save_maze_as_image(file_path)
+                    if ext == '.txt':
+                        maze.save_maze_to_file(file_path, True)
+                    else:
+                        maze.save_maze_as_image(file_path)
     except ValueError as e:
         print(e)
 

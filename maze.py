@@ -8,7 +8,7 @@ class Maze:
     """
     Класс реализует лабиринт, алгоритм генерации, решения и импорта лабиринта
     """
-    def __init__(self, height: int, width: int):
+    def __init__(self, height: int, width: int) -> None:
         """
         Инициализация лабиринта с созданием клеток окруженных стенами
         :param height: высота
@@ -40,7 +40,7 @@ class Maze:
                 if x == self.width - 1 and y == self.height - 1:
                     # В правом нижнем углу ничего не делаем
                     continue
-                elif x == self.width - 1:  # Если мы в последнем столбце, удаляем стену вниз
+                if x == self.width - 1:  # Если мы в последнем столбце, удаляем стену вниз
                     self.list_maze[2 * y + 2][2 * x + 1] = '1'
                 elif y == self.height - 1:  # Если мы в последней строке, удаляем стену вправо
                     self.list_maze[2 * y + 1][2 * x + 2] = '1'
@@ -56,7 +56,7 @@ class Maze:
         for row in self.list_maze:
             print(' '.join(row).replace('0', '#').replace('1', ' '))
 
-    def solve_maze(self, start: Tuple[int, int] = None, end: Tuple[int, int] = None) -> List:
+    def solve_maze(self, start: Tuple[int, int] = None, end: Tuple[int, int] = None) -> List[Tuple[int, int]]:
         """
         Решение лабиринта методом DFS от стартовой до конечной позиции.
 
@@ -167,18 +167,24 @@ class Maze:
 
         if maze_check(maze):
             self.list_maze = maze
-            self.height = len(self.list_maze)
-            self.width = len(self.list_maze[0])
+            self.height = (len(self.list_maze) - 1) // 2
+            self.width = (len(self.list_maze[0]) - 1) // 2
 
         return maze
 
-    def save_maze_to_file(self, file_path: str) -> None:
+    def save_maze_to_file(self, file_path: str, way: bool = False) -> None:
         """
         Сохраняет лабиринт в текстовый файл.
 
         Args:
             file_path (str): Путь к файлу для сохранения лабиринта.
+            way (bool): решение лабиринта
         """
+        if way and len(self.list_way) > 0:
+            for y in range(self.height):
+                for x in range(self.width):
+                    if (y, x) in self.list_way:
+                        self.list_maze[y][x] = '.'
         with open(file_path, 'w') as file:
             for row in self.list_maze:
                 file.write(''.join(row) + '\n')  # Преобразуем каждую строку в строку текста
@@ -253,8 +259,8 @@ class Maze:
             maze.append(row)
         if maze_check(maze):
             self.list_maze = maze
-            self.height = len(self.list_maze)
-            self.width = len(self.list_maze[0])
+            self.height = (len(self.list_maze) - 1) // 2
+            self.width = (len(self.list_maze[0]) - 1) // 2
 
     def build_right_walls(self):
         pass
@@ -266,7 +272,7 @@ class Maze:
         pass
 
 
-def maze_check(maze: list) -> bool:
+def maze_check(maze: List) -> bool:
     """
     Проверяет корректность лабиринта.
 
@@ -310,4 +316,8 @@ def maze_check(maze: list) -> bool:
 
 
 if __name__ == '__main__':
-    maxe = Maze(10, 10)
+    maxe = Maze(3, 3)
+    maxe.load_maze_from_image('maze.png')
+    print(maxe.height, maxe.width)
+    maxe.solve_maze()
+    maxe.print_solution()
